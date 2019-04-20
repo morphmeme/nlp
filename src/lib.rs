@@ -48,23 +48,26 @@ pub fn alignment_path(graphemes1 : &Graphemes, graphemes2: &Graphemes, sub_cost 
     backtrace_alignment_matrix((graphemes1.len(), graphemes2.len()), mat)
 }
 
-// Contract: Grapheme inputs cannot contain spaces
+
 /// Returns an alignment of two strings as an array of two graphemes
-/// e.g.
-/// inten   tion
-///    execution
 /// # Arguments
 /// * `graphemes1` - Graphemes to compare with `graphemes2`
 /// * `graphemes2` - Graphemes to compare with `graphemes1`
 /// * `sub_cost` - Cost of substituting a character with another
+/// * `ins_del_char` - &str for indicating insertion/deletion
 ///
 /// # Example
 /// ```
 /// use nlp::alignment_strings;
 /// use nlp::graphemes_struct::Graphemes;
-/// println!("{}\n{}", alignment_strings(&Graphemes::new("book"), &Graphemes::new("back"), 1), 2);
+/// let intention = Graphemes::new("intention");
+/// let execution = Graphemes::new("execution");
+/// let strings = alignment_strings(&intention, &execution, 1, " ");
+/// // strings contains
+/// // 0. inten tion
+/// // 1. ex ecution
 /// ```
-pub fn alignment_strings<'a>(graphemes1 : &'a Graphemes<'a>, graphemes2 : &'a Graphemes<'a>, sub_cost : usize) -> [Graphemes<'a>; 2] {
+pub fn alignment_strings<'a>(graphemes1 : &'a Graphemes, graphemes2 : &'a Graphemes, sub_cost : usize, ins_del_char : &'a str) -> [Graphemes<'a>; 2] {
     let path = alignment_path(&graphemes1, &graphemes2, sub_cost);
     if path.is_empty() {
         return [Graphemes::new(""), Graphemes::new("")];
@@ -79,12 +82,12 @@ pub fn alignment_strings<'a>(graphemes1 : &'a Graphemes<'a>, graphemes2 : &'a Gr
             align_graphemes1.push(graphemes1.at(row).clone());
             align_graphemes2.push(graphemes2.at(col).clone());
         } else if row == prev_coord.0 && col + 1 == prev_coord.1 {
-            align_graphemes1.push(" ");
+            align_graphemes1.push(ins_del_char);
             align_graphemes2.push(graphemes2.at(col).clone());
         }
         else if row + 1== prev_coord.0 && col == prev_coord.1 {
             align_graphemes1.push(graphemes1.at(row).clone());
-            align_graphemes2.push(" ");
+            align_graphemes2.push(ins_del_char);
         } else {
             panic!();
         }
@@ -95,25 +98,47 @@ pub fn alignment_strings<'a>(graphemes1 : &'a Graphemes<'a>, graphemes2 : &'a Gr
     [align_graphemes1, align_graphemes2]
 }
 
-pub fn max_match<'a>(graphemes : &Graphemes<'a>, dictionary : &HashSet<Graphemes>) -> Vec<Graphemes<'a>> {
-    if graphemes.is_empty() {
-        return vec![];
+/// Segments a sentence with space using the max match algorithm
+/// # Arguments
+/// * `sentence` - Sentence composed of graphemes to be segmented
+/// * `dictionary` - HashSet containing words for matching possible words in the sentence for segmentation
+///
+/// # Example
+/// ```
+/// use nlp::max_match;
+/// use nlp::graphemes_struct::Graphemes;
+/// use std::collections::HashSet;
+/// let mut dictionary : HashSet<Graphemes> = HashSet::new();
+///        dictionary.insert(Graphemes::new("他"));
+///        dictionary.insert(Graphemes::new("特别"));
+///        dictionary.insert(Graphemes::new("喜欢"));
+///        dictionary.insert(Graphemes::new("北京烤鸭"));
+/// let sentence = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &chinese_dictionary);
+/// assert_eq!(&sentence, &Graphemes::new("他 特别 喜欢 北京烤鸭"));
+/// ```
+pub fn max_match<'a>(sentence : &Graphemes<'a>, dictionary : &HashSet<Graphemes>) -> Graphemes<'a> {
+    if sentence.is_empty() {
+        return Graphemes::new("");
     }
-    for i in (1..graphemes.len()+1).rev() {
-        let first_word = graphemes.slice(0,i);
-        let remainder = graphemes.slice(i, graphemes.len());
+    for i in (1..sentence.len()+1).rev() {
+        let mut first_word = sentence.slice(0,i);
+        let remainder = sentence.slice(i, sentence.len());
         if dictionary.contains(&first_word) {
-            let mut sentence = vec![first_word];
-            sentence.append(&mut max_match(&remainder, dictionary));
-            return sentence;
+            if !remainder.is_empty() {
+                first_word.push(" ");
+            }
+            first_word.append(max_match(&remainder, dictionary));
+            return first_word;
         }
     }
-    let first_word = graphemes.slice(0,1);
-    let remainder = graphemes.slice(1, graphemes.len());
+    let mut first_word = sentence.slice(0,1);
+    let remainder = sentence.slice(1, sentence.len());
 
-    let mut sentence = vec![first_word];
-    sentence.append(&mut max_match(&remainder, dictionary));
-    sentence
+    if !remainder.is_empty() {
+        first_word.push(" ");
+    }
+    first_word.append(max_match(&remainder, dictionary));
+    return first_word;
 }
 
 fn levenshtein_distance_recurrence_matrix(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize) -> Vec<Vec<usize>> {
@@ -227,15 +252,13 @@ mod test_cases {
         assert_eq!(levenshtein_distance(&Graphemes::new("不患人之不己知患不知人也"), &Graphemes::new("己所不欲勿施于人"), 1), 10);
     }
 
-    fn calculate_edit_distance_from_alignment(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize) -> usize {
-        let alignments = alignment_strings(graphemes1, graphemes2, sub_cost);
+    fn calculate_edit_distance_from_alignment(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize, ins_del_char : &str) -> usize {
+        let alignments = alignment_strings(graphemes1, graphemes2, sub_cost, ins_del_char);
         assert_eq!(alignments[0].len(), alignments[1].len());
         println!("{}\n{}", alignments[0], alignments[1]);
         let mut edit_distance = 0;
         for i in 0..alignments[0].len() {
-            if alignments[0].at(i) == " " && alignments[1].at(i) == " " {
-                panic!("Space character contract violated");
-            } else if alignments[0].at(i) == " " {
+            if alignments[0].at(i) == " " {
                 edit_distance += 1;
             } else if alignments[1].at(i) == " " {
                 edit_distance += 1;
@@ -249,41 +272,41 @@ mod test_cases {
     #[test]
     fn alignment_path_basic_test() {
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new(""), 2), 0);
+            &Graphemes::new(""), &Graphemes::new(""), 2, " "), 0);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new("a"), 2), 1);
+            &Graphemes::new(""), &Graphemes::new("a"), 2, " "), 1);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("a"), &Graphemes::new(""), 2), 1);
+            &Graphemes::new("a"), &Graphemes::new(""), 2, " "), 1);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new("aa"), 2), 2);
+            &Graphemes::new(""), &Graphemes::new("aa"), 2, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("aa"), &Graphemes::new(""), 2), 2);
+            &Graphemes::new("aa"), &Graphemes::new(""), 2, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("a"), &Graphemes::new("b"), 2), 2);
+            &Graphemes::new("a"), &Graphemes::new("b"), 2, " "), 2);
     }
 
     #[test]
     fn alignment_path_example_test() {
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("book"), &Graphemes::new("back"), 1), 2);
+            &Graphemes::new("book"), &Graphemes::new("back"), 1, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("back"), &Graphemes::new("book"), 1), 2);
+            &Graphemes::new("back"), &Graphemes::new("book"), 1, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("kitten"), &Graphemes::new("sitting"), 1), 3);
+            &Graphemes::new("kitten"), &Graphemes::new("sitting"), 1, " "), 3);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("sitting"), &Graphemes::new("kitten"), 1), 3);
+            &Graphemes::new("sitting"), &Graphemes::new("kitten"), 1, " "), 3);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("longstring"), &Graphemes::new("short"), 1), 9);
+            &Graphemes::new("longstring"), &Graphemes::new("short"), 1, " "), 9);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("short"), &Graphemes::new("longstring"), 1), 9);
+            &Graphemes::new("short"), &Graphemes::new("longstring"), 1, " "), 9);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("superman"), &Graphemes::new("batman"), 1), 5);
+            &Graphemes::new("superman"), &Graphemes::new("batman"), 1, " "), 5);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("batman"), &Graphemes::new("superman"), 1), 5);
+            &Graphemes::new("batman"), &Graphemes::new("superman"), 1, " "), 5);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new("aaaaaaaaaaaaaaaaa"), 1), 17);
+            &Graphemes::new(""), &Graphemes::new("aaaaaaaaaaaaaaaaa"), 1, " "), 17);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("aaaaaaaaaaaaaaaaa"), &Graphemes::new(""), 1), 17);
+            &Graphemes::new("aaaaaaaaaaaaaaaaa"), &Graphemes::new(""), 1, " "), 17);
     }
 
     fn chinese_dictionary() -> HashSet<Graphemes<'static>> {
@@ -298,20 +321,11 @@ mod test_cases {
     #[test]
     fn max_match_test() {
         let chinese_dictionary = chinese_dictionary();
-        let empty_sentence : Vec<Graphemes> = max_match(&Graphemes::new(""), &chinese_dictionary);
+        let empty_sentence : Graphemes = max_match(&Graphemes::new(""), &chinese_dictionary);
         assert!(empty_sentence.is_empty());
-        let sentence : Vec<Graphemes> = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &chinese_dictionary);
-        assert_eq!(sentence[0], Graphemes::new("他"));
-        assert_eq!(sentence[1], Graphemes::new("特别"));
-        assert_eq!(sentence[2], Graphemes::new("喜欢"));
-        assert_eq!(sentence[3], Graphemes::new("北京烤鸭"));
-        let another_sentence : Vec<Graphemes> = max_match(&Graphemes::new("english"), &chinese_dictionary);
-        assert_eq!(another_sentence[0], Graphemes::new("e"));
-        assert_eq!(another_sentence[1], Graphemes::new("n"));
-        assert_eq!(another_sentence[2], Graphemes::new("g"));
-        assert_eq!(another_sentence[3], Graphemes::new("l"));
-        assert_eq!(another_sentence[4], Graphemes::new("i"));
-        assert_eq!(another_sentence[5], Graphemes::new("s"));
-        assert_eq!(another_sentence[6], Graphemes::new("h"));
+        let sentence = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &chinese_dictionary);
+        assert_eq!(&sentence, &Graphemes::new("他 特别 喜欢 北京烤鸭"));
+        let another_sentence = max_match(&Graphemes::new("english"), &chinese_dictionary);
+        assert_eq!(&another_sentence, &Graphemes::new("e n g l i s h"));
     }
 }

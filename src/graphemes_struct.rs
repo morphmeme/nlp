@@ -44,6 +44,10 @@ mod graphemes_struct {
         pub fn slice(&self, start : usize, end : usize) -> Self {
             Graphemes { graphemes: self.graphemes[start..end].to_vec() }
         }
+
+        pub fn append(&mut self, mut other : Graphemes<'a>) {
+            self.graphemes.append(&mut other.graphemes);
+        }
     }
 
     impl<'a> Display for Graphemes<'a> {
