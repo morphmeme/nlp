@@ -1,5 +1,6 @@
 pub use self::metrics::levenshtein_distance;
 pub use self::metrics::word_error_rate;
+pub use self::metrics::word_accuracy;
 
 mod metrics {
     use itertools::Itertools;
@@ -63,13 +64,51 @@ mod metrics {
     /// use nlp::metrics::word_error_rate;
     /// use nlp::graphemes_struct::Graphemes;
     /// use nlp::max_match;
-    /// let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &english_dictionary());
+    /// use std::collections::HashSet;
+    /// let mut dictionary : HashSet<Graphemes> = HashSet::new();
+    /// dictionary.insert(Graphemes::new("we"));
+    /// dictionary.insert(Graphemes::new("canon"));
+    /// dictionary.insert(Graphemes::new("see"));
+    /// dictionary.insert(Graphemes::new("ash"));
+    /// dictionary.insert(Graphemes::new("ort"));
+    /// dictionary.insert(Graphemes::new("distance"));
+    /// dictionary.insert(Graphemes::new("ahead"));
+    /// let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &dictionary);
     /// let actual_sentence = Graphemes::new("we can only see a short distance ahead");
-    /// assert_eq!(word_error_rate(&actual_sentence, &predicted_sentence),0.13157894736842105);
+    /// assert_eq!(word_error_rate(&actual_sentence, &predicted_sentence),0.625);
     /// ```
     pub fn word_error_rate(actual_sentence : &Graphemes, predict_sentence : &Graphemes) -> f64 {
-        let lev_distance = levenshtein_distance(&actual_sentence.split(" "), &predict_sentence.split(" "), 1);
-        lev_distance as f64 / actual_sentence.len() as f64
+        let actual_split_sentence = actual_sentence.split(" ");
+        let lev_distance = levenshtein_distance(&actual_split_sentence, &predict_sentence.split(" "), 1);
+        lev_distance as f64 / actual_split_sentence.len() as f64
+    }
+
+    /// Calculates the word accuracy 1 - (word insertions + deletions + substitutions) / (length of the correct sentence)
+    ///
+    /// # Arguments
+    /// * `actual_sentence` - actual sentence
+    /// * `predict_sentence` - predicted sentence
+    ///
+    /// # Example
+    /// ```
+    /// use nlp::metrics::word_accuracy;
+    /// use nlp::graphemes_struct::Graphemes;
+    /// use nlp::max_match;
+    /// use std::collections::HashSet;
+    /// let mut dictionary : HashSet<Graphemes> = HashSet::new();
+    /// dictionary.insert(Graphemes::new("we"));
+    /// dictionary.insert(Graphemes::new("canon"));
+    /// dictionary.insert(Graphemes::new("see"));
+    /// dictionary.insert(Graphemes::new("ash"));
+    /// dictionary.insert(Graphemes::new("ort"));
+    /// dictionary.insert(Graphemes::new("distance"));
+    /// dictionary.insert(Graphemes::new("ahead"));
+    /// let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &dictionary);
+    /// let actual_sentence = Graphemes::new("we can only see a short distance ahead");
+    /// assert_eq!(word_accuracy(&actual_sentence, &predicted_sentence),0.375);
+    /// ```
+    pub fn word_accuracy(actual_sentence : &Graphemes, predict_sentence : &Graphemes) -> f64 {
+        1.0 - word_error_rate(actual_sentence, predict_sentence)
     }
 }
 
@@ -78,6 +117,7 @@ mod test_cases {
     use crate::metrics::{levenshtein_distance, word_error_rate};
     use crate::graphemes_struct::Graphemes;
     use crate::max_match;
+    use std::collections::HashSet;
 
     #[test]
     fn edit_distance_basic_test() {
@@ -130,9 +170,17 @@ mod test_cases {
 
     #[test]
     fn word_error_rate_test() {
-        let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &english_dictionary());
+        let mut dictionary : HashSet<Graphemes> = HashSet::new();
+        dictionary.insert(Graphemes::new("we"));
+        dictionary.insert(Graphemes::new("canon"));
+        dictionary.insert(Graphemes::new("see"));
+        dictionary.insert(Graphemes::new("ash"));
+        dictionary.insert(Graphemes::new("ort"));
+        dictionary.insert(Graphemes::new("distance"));
+        dictionary.insert(Graphemes::new("ahead"));
+        let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &dictionary);
         let actual_sentence = Graphemes::new("we can only see a short distance ahead");
-        assert_eq!(word_error_rate(&actual_sentence, &predicted_sentence),0.13157894736842105);
+        assert_eq!(word_error_rate(&actual_sentence, &predicted_sentence),0.625);
         assert_eq!(word_error_rate(&actual_sentence, &actual_sentence),0.0)
     }
 }

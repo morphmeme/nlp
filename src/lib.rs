@@ -97,7 +97,7 @@ pub fn alignment_strings<'a, T, U>(graphemes1 : &T, graphemes2 : &T, sub_cost : 
 ///        dictionary.insert(Graphemes::new("特别"));
 ///        dictionary.insert(Graphemes::new("喜欢"));
 ///        dictionary.insert(Graphemes::new("北京烤鸭"));
-/// let sentence = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &chinese_dictionary);
+/// let sentence = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &dictionary);
 /// assert_eq!(&sentence, &Graphemes::new("他 特别 喜欢 北京烤鸭"));
 /// ```
 pub fn max_match<'a>(sentence : &Graphemes<'a>, dictionary : &HashSet<Graphemes>) -> Graphemes<'a> {
