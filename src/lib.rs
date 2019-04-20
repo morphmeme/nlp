@@ -1,14 +1,16 @@
 use std::cmp::min;
 use std::collections::{HashMap, HashSet};
-use itertools::Itertools;
 use crate::graphemes_struct::Graphemes;
+use len_trait::len::{Len};
+use itertools::Itertools;
+use std::ops::Index;
+use push_trait::base::Push;
 
 pub mod graphemes_struct;
 
 type Coordinate = (usize, usize);
 
-
-/// Calculates the levenshtein distance between two graphemes
+/// Calculates the levenshtein distance between two words
 ///
 /// # Arguments
 /// * `graphemes1` - Graphemes to compare with `graphemes2`
@@ -23,12 +25,13 @@ type Coordinate = (usize, usize);
 /// assert_eq!(levenshtein_distance(&Graphemes::new("back"), &Graphemes::new("book"), 1), 2);
 /// assert_eq!(levenshtein_distance(&Graphemes::new("kitten"), &Graphemes::new("sitting"), 1), 3);
 /// ```
-pub fn levenshtein_distance(graphemes1 : &Graphemes, graphemes2: &Graphemes, sub_cost : usize) -> usize {
+pub fn levenshtein_distance<'a, T, U>(graphemes1 : &T, graphemes2: &T, sub_cost : usize) -> usize
+    where T : Len + Index<usize, Output = U>, U: PartialEq + 'a {
     levenshtein_distance_recurrence_matrix(graphemes1, graphemes2, sub_cost)[graphemes1.len()][graphemes2.len()]
 }
 
 /// Returns the backtraced path as a vector of coordinates (row, col) from the levenshtein distance cost matrix
-/// starting at `(graphemes1.len(), graphemes2.len())`
+/// starting at `(0, 0)`
 ///
 /// # Arguments
 /// * `graphemes1` - Graphemes to compare with `graphemes2`
@@ -41,13 +44,15 @@ pub fn levenshtein_distance(graphemes1 : &Graphemes, graphemes2: &Graphemes, sub
 /// use nlp::graphemes_struct::Graphemes;
 ///
 /// alignment_path(&Graphemes::new("dog"), &Graphemes::new("woof"), 1);
-/// // returns [(3, 4), (3, 3), (2, 2), (1, 1), (0, 0)]
+/// // returns [(0, 0), (1, 1), (2, 2), (3, 3), (3, 4)]
 /// ```
-pub fn alignment_path(graphemes1 : &Graphemes, graphemes2: &Graphemes, sub_cost : usize) -> Vec<Coordinate> {
-    let mat = alignment_matrix(&graphemes1, &graphemes2, sub_cost);
-    backtrace_alignment_matrix((graphemes1.len(), graphemes2.len()), mat)
+pub fn alignment_path<'a, T, U>(graphemes1 : &T, graphemes2: &T, sub_cost : usize) -> Vec<Coordinate>
+    where T : Len + Index<usize, Output = U>, U : PartialEq + 'a {
+    let mat = alignment_matrix(graphemes1, graphemes2, sub_cost);
+    let mut path = backtrace_alignment_matrix((graphemes1.len(), graphemes2.len()), mat);
+    path.reverse();
+    path
 }
-
 
 /// Returns an alignment of two strings as an array of two graphemes
 /// # Arguments
@@ -67,40 +72,39 @@ pub fn alignment_path(graphemes1 : &Graphemes, graphemes2: &Graphemes, sub_cost 
 /// // 0. inten tion
 /// // 1. ex ecution
 /// ```
-pub fn alignment_strings<'a>(graphemes1 : &'a Graphemes, graphemes2 : &'a Graphemes, sub_cost : usize, ins_del_char : &'a str) -> [Graphemes<'a>; 2] {
-    let path = alignment_path(&graphemes1, &graphemes2, sub_cost);
+pub fn alignment_strings<'a, T, U>(graphemes1 : &T, graphemes2 : &T, sub_cost : usize, ins_del_char : U) -> [T; 2]
+    where T : 'a + Default + Len + Push<U> + Index<usize, Output = U>, U : PartialEq + Clone + 'a{
+    let path = alignment_path(graphemes1, graphemes2, sub_cost);
     if path.is_empty() {
-        return [Graphemes::new(""), Graphemes::new("")];
+        return [T::default(), T::default()];
     }
-    let mut align_graphemes1 = Graphemes::new("");
-    let mut align_graphemes2 = Graphemes::new("");
+    let mut align_graphemes1 = T::default();
+    let mut align_graphemes2 = T::default();
 
     let mut path_iter = path.iter();
     let mut prev_coord = *path_iter.next().unwrap(); // handled by the if case
     for &(row, col) in path_iter {
-        if row + 1 == prev_coord.0 && col + 1 == prev_coord.1 {
-            align_graphemes1.push(graphemes1.at(row).clone());
-            align_graphemes2.push(graphemes2.at(col).clone());
-        } else if row == prev_coord.0 && col + 1 == prev_coord.1 {
-            align_graphemes1.push(ins_del_char);
-            align_graphemes2.push(graphemes2.at(col).clone());
+        if row != 0 && row - 1 == prev_coord.0 && col != 0 && col - 1 == prev_coord.1 {
+            align_graphemes1.push(graphemes1[row-1].clone());
+            align_graphemes2.push(graphemes2[col-1].clone());
+        } else if row == prev_coord.0 && col != 0 && col - 1 == prev_coord.1 {
+            align_graphemes1.push(ins_del_char.clone());
+            align_graphemes2.push(graphemes2[col-1].clone());
         }
-        else if row + 1== prev_coord.0 && col == prev_coord.1 {
-            align_graphemes1.push(graphemes1.at(row).clone());
-            align_graphemes2.push(ins_del_char);
+        else if row != 0 && row - 1 == prev_coord.0 && col == prev_coord.1 {
+            align_graphemes1.push(graphemes1[row-1].clone());
+            align_graphemes2.push(ins_del_char.clone());
         } else {
             panic!();
         }
         prev_coord = (row, col);
     }
-    align_graphemes1.reverse();
-    align_graphemes2.reverse();
     [align_graphemes1, align_graphemes2]
 }
 
 /// Segments a sentence with space using the max match algorithm
 /// # Arguments
-/// * `sentence` - Sentence composed of graphemes to be segmented
+/// * `sentence` - Sentence composed of words unseperated to be segmented
 /// * `dictionary` - HashSet containing words for matching possible words in the sentence for segmentation
 ///
 /// # Example
@@ -141,7 +145,13 @@ pub fn max_match<'a>(sentence : &Graphemes<'a>, dictionary : &HashSet<Graphemes>
     return first_word;
 }
 
-fn levenshtein_distance_recurrence_matrix(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize) -> Vec<Vec<usize>> {
+//pub fn word_error_rate(sentence1 : &Graphemes, sentence2 : &Graphemes) -> usize {
+//    let lev_distance = levenshtein_distance(sentence1, sentence2, 1);
+//
+//}
+
+fn levenshtein_distance_recurrence_matrix<'a, T, U>(graphemes1 : &T, graphemes2 : &T, sub_cost : usize) -> Vec<Vec<usize>>
+    where T : Len + Index<usize, Output = U>, U : PartialEq + 'a {
     let num_rows = graphemes1.len() + 1;
     let num_cols = graphemes2.len() + 1;
     let mut recurrence_matrix : Vec<Vec<usize>> = vec![vec![0; num_cols]; num_rows];
@@ -175,7 +185,8 @@ fn backtrace_alignment_matrix<'a>(start_coord : Coordinate, backtrace : HashMap<
     path
 }
 
-fn alignment_matrix(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize) -> HashMap<Coordinate, Coordinate> {
+fn alignment_matrix<'a, T, U>(graphemes1 : &T, graphemes2 : &T, sub_cost : usize) -> HashMap<Coordinate, Coordinate>
+    where T : Len + Index<usize, Output = U>, U : PartialEq + 'a {
     let num_rows = graphemes1.len() + 1;
     let num_cols = graphemes2.len() + 1;
     let mut backtrace : HashMap<Coordinate, Coordinate> = HashMap::new();
@@ -231,6 +242,18 @@ mod test_cases {
     }
 
     #[test]
+    fn edit_distance_vec_of_graphemes_test() {
+        assert_eq!(levenshtein_distance(&vec![Graphemes::new("")]
+                                        , &vec![Graphemes::new(""),], 1), 0);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::new("hello"), Graphemes::new("world")]
+                                        , &vec![Graphemes::new("bye"), Graphemes::new("bye")], 1), 2);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::new("hello")]
+                                        , &vec![Graphemes::new("bye"), Graphemes::new("bye")], 2), 3);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::new("hello"), Graphemes::new("world")]
+                                        , &vec![Graphemes::new("bye")], 2), 3);
+    }
+
+    #[test]
     fn edit_distance_example_test() {
         assert_eq!(levenshtein_distance(&Graphemes::new("book"), &Graphemes::new("back"), 1), 2);
         assert_eq!(levenshtein_distance(&Graphemes::new("back"), &Graphemes::new("book"), 1), 2);
@@ -255,14 +278,11 @@ mod test_cases {
     fn calculate_edit_distance_from_alignment(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize, ins_del_char : &str) -> usize {
         let alignments = alignment_strings(graphemes1, graphemes2, sub_cost, ins_del_char);
         assert_eq!(alignments[0].len(), alignments[1].len());
-        println!("{}\n{}", alignments[0], alignments[1]);
         let mut edit_distance = 0;
         for i in 0..alignments[0].len() {
-            if alignments[0].at(i) == " " {
+            if alignments[0][i] == " " || alignments[1][i] == " " {
                 edit_distance += 1;
-            } else if alignments[1].at(i) == " " {
-                edit_distance += 1;
-            } else if alignments[0].at(i) != alignments[1].at(i) {
+            } else if alignments[0][i] != alignments[1][i] {
                 edit_distance += sub_cost;
             }
         }
