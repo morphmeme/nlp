@@ -9,7 +9,7 @@ mod graphemes_struct {
     use std::fmt;
 
     /// Vector of graphemes
-    #[derive(Debug)]
+    #[derive(Debug, Hash, Eq, PartialEq)]
     pub struct Graphemes<'a> {
         graphemes : Vec<&'a str>
     }
@@ -39,6 +39,10 @@ mod graphemes_struct {
 
         pub fn reverse(&mut self) {
             self.graphemes.reverse();
+        }
+
+        pub fn slice(&self, start : usize, end : usize) -> Self {
+            Graphemes { graphemes: self.graphemes[start..end].to_vec() }
         }
     }
 

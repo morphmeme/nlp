@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7789a7be-bb7b-4e09-bbe7-0245e34160eb" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/graphemes_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="7789a7be-bb7b-4e09-bbe7-0245e34160eb" name="Default Changelist" comment="Update parameters for private functions for brevity&#10;Add exercise 2.8">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphemes_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphemes_struct.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -38,17 +37,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/lib.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="230" column="61" lean-forward="true" selection-start-line="230" selection-start-column="61" selection-end-line="230" selection-end-column="61" />
+            <state relative-caret-position="290">
+              <caret line="306" column="40" selection-start-line="306" selection-start-column="40" selection-end-line="306" selection-end-column="40" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="51">
+                <caret line="3" column="30" selection-start-line="3" selection-start-column="30" selection-end-line="3" selection-end-column="30" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graphemes_struct.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="27" selection-start-line="4" selection-start-column="27" selection-end-line="4" selection-end-column="27" />
+            <state relative-caret-position="324">
+              <caret line="57" column="5" lean-forward="true" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
               <folding>
                 <element signature="e#493#494#0" expanded="true" />
                 <element signature="e#528#529#0" expanded="true" />
@@ -100,8 +111,9 @@
       <find>reverse</find>
       <find>graphemes</find>
       <find>grapheme1.len</find>
-      <find>deref</find>
       <find>assert</find>
+      <find>deref</find>
+      <find>max_match</find>
     </findStrings>
     <replaceStrings>
       <replace>grapheme2</replace>
@@ -114,11 +126,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/Graphemes.rs" />
-        <option value="$PROJECT_DIR$/src/lib.rs" />
         <option value="$PROJECT_DIR$/src/main.rs" />
         <option value="$PROJECT_DIR$/src/graphemes_struct.rs" />
+        <option value="$PROJECT_DIR$/src/lib.rs" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -174,7 +186,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Cargo Command.Doc lib">
+  <component name="RunManager" selected="Cargo Command.Test test_cases::max_match_test">
     <configuration name="Bench lib" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="bench" />
@@ -225,15 +237,27 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="Test test_cases::max_match_test" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="test --package nlp --lib test_cases::max_match_test -- --exact" />
+      <option name="allFeatures" value="false" />
+      <option name="nocapture" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Cargo Command.Bench lib" />
       <item itemvalue="Cargo Command.Run lib" />
       <item itemvalue="Cargo Command.Doc lib" />
       <item itemvalue="Cargo Command.Test lib" />
       <item itemvalue="Cargo Command.Run nlp" />
+      <item itemvalue="Cargo Command.Test test_cases::max_match_test" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo Command.Test test_cases::max_match_test" />
         <item itemvalue="Cargo Command.Test lib" />
         <item itemvalue="Cargo Command.Run nlp" />
       </list>
@@ -250,7 +274,7 @@
       <option name="presentableId" value="Default" />
       <updated>1555658557612</updated>
       <workItem from="1555658562472" duration="9638000" />
-      <workItem from="1555717839416" duration="13231000" />
+      <workItem from="1555717839416" duration="16655000" />
     </task>
     <task id="LOCAL-00001" summary="Complete exercise 2.6 (edit distance algo.)">
       <created>1555658664216</created>
@@ -266,49 +290,63 @@
       <option name="project" value="LOCAL" />
       <updated>1555658807462</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Move graphemes struct to it's own module&#10;Add alignment methods">
+      <created>1555731236972</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1555731236972</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Update readme with exercise 2.7&#10;Format exercises into task list">
+      <created>1555731435570</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1555731435570</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_lib - 2019.04.19 at 22h 47m 47s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 19m 15s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 22h 48m 58s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 20m 02s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 22h 49m 49s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 20m 40s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 22h 51m 24s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 21m 08s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 22h 52m 03s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 22m 18s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 23h 00m 56s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 23m 29s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 23h 02m 34s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 25m 44s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 23h 18m 51s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 26m 54s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 23h 26m 56s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 27m 21s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
-    <history-entry file="Test_lib - 2019.04.19 at 23h 29m 51s.xml">
-      <configuration name="Test lib" configurationId="CargoCommandRunConfiguration" />
+    <history-entry file="Test_test_cases__max_match_test - 2019.04.20 at 00h 28m 03s.xml">
+      <configuration name="Test test_cases::max_match_test" configurationId="CargoCommandRunConfiguration" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="22869000" />
+    <option name="totallyTimeSpent" value="26293000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22818792" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22818792" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -317,7 +355,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.30563003" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3016086" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -345,23 +383,15 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Complete exercise 2.6 (edit distance algo.)" />
     <MESSAGE value="Updated readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated readme" />
+    <MESSAGE value="Move graphemes struct to it's own module&#10;Add alignment methods" />
+    <MESSAGE value="Update readme with exercise 2.7&#10;Format exercises into task list" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update readme with exercise 2.7&#10;Format exercises into task list" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="34">
-            <caret line="2" column="28" lean-forward="true" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.rustup/toolchains/stable-x86_64-pc-windows-msvc/lib/rustlib/src/rust/src/libcore/option.rs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="163">
@@ -376,17 +406,10 @@
     <entry file="file://$PROJECT_DIR$/src/main.rs">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/lib.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="230" column="61" lean-forward="true" selection-start-line="230" selection-start-column="61" selection-end-line="230" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/graphemes_struct.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="27" selection-start-line="4" selection-start-column="27" selection-end-line="4" selection-end-column="27" />
+        <state relative-caret-position="324">
+          <caret line="57" column="5" lean-forward="true" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
           <folding>
             <element signature="e#493#494#0" expanded="true" />
             <element signature="e#528#529#0" expanded="true" />
@@ -403,6 +426,23 @@
             <element signature="e#1135#1136#0" expanded="true" />
             <element signature="e#1165#1166#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lib.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="306" column="40" selection-start-line="306" selection-start-column="40" selection-end-line="306" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="51">
+            <caret line="3" column="30" selection-start-line="3" selection-start-column="30" selection-end-line="3" selection-end-column="30" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>

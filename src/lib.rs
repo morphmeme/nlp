@@ -1,5 +1,5 @@
 use std::cmp::min;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
 use crate::graphemes_struct::Graphemes;
 
@@ -95,7 +95,28 @@ pub fn alignment_strings<'a>(graphemes1 : &'a Graphemes<'a>, graphemes2 : &'a Gr
     [align_graphemes1, align_graphemes2]
 }
 
-fn levenshtein_distance_recurrence_matrix(graphemes1 : &Vec<&str>, graphemes2 : &Vec<&str>, sub_cost : usize) -> Vec<Vec<usize>> {
+pub fn max_match<'a>(graphemes : &Graphemes<'a>, dictionary : &HashSet<Graphemes>) -> Vec<Graphemes<'a>> {
+    if graphemes.is_empty() {
+        return vec![];
+    }
+    for i in (1..graphemes.len()+1).rev() {
+        let first_word = graphemes.slice(0,i);
+        let remainder = graphemes.slice(i, graphemes.len());
+        if dictionary.contains(&first_word) {
+            let mut sentence = vec![first_word];
+            sentence.append(&mut max_match(&remainder, dictionary));
+            return sentence;
+        }
+    }
+    let first_word = graphemes.slice(0,1);
+    let remainder = graphemes.slice(1, graphemes.len());
+
+    let mut sentence = vec![first_word];
+    sentence.append(&mut max_match(&remainder, dictionary));
+    sentence
+}
+
+fn levenshtein_distance_recurrence_matrix(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize) -> Vec<Vec<usize>> {
     let num_rows = graphemes1.len() + 1;
     let num_cols = graphemes2.len() + 1;
     let mut recurrence_matrix : Vec<Vec<usize>> = vec![vec![0; num_cols]; num_rows];
@@ -129,7 +150,7 @@ fn backtrace_alignment_matrix<'a>(start_coord : Coordinate, backtrace : HashMap<
     path
 }
 
-fn alignment_matrix(graphemes1 : &Vec<&str>, graphemes2 : &Vec<&str>, sub_cost : usize) -> HashMap<Coordinate, Coordinate> {
+fn alignment_matrix(graphemes1 : &Graphemes, graphemes2 : &Graphemes, sub_cost : usize) -> HashMap<Coordinate, Coordinate> {
     let num_rows = graphemes1.len() + 1;
     let num_cols = graphemes2.len() + 1;
     let mut backtrace : HashMap<Coordinate, Coordinate> = HashMap::new();
@@ -263,5 +284,34 @@ mod test_cases {
             &Graphemes::new(""), &Graphemes::new("aaaaaaaaaaaaaaaaa"), 1), 17);
         assert_eq!(calculate_edit_distance_from_alignment(
             &Graphemes::new("aaaaaaaaaaaaaaaaa"), &Graphemes::new(""), 1), 17);
+    }
+
+    fn chinese_dictionary() -> HashSet<Graphemes<'static>> {
+        let mut dictionary : HashSet<Graphemes> = HashSet::new();
+        dictionary.insert(Graphemes::new("他"));
+        dictionary.insert(Graphemes::new("特别"));
+        dictionary.insert(Graphemes::new("喜欢"));
+        dictionary.insert(Graphemes::new("北京烤鸭"));
+        dictionary
+    }
+
+    #[test]
+    fn max_match_test() {
+        let chinese_dictionary = chinese_dictionary();
+        let empty_sentence : Vec<Graphemes> = max_match(&Graphemes::new(""), &chinese_dictionary);
+        assert!(empty_sentence.is_empty());
+        let sentence : Vec<Graphemes> = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &chinese_dictionary);
+        assert_eq!(sentence[0], Graphemes::new("他"));
+        assert_eq!(sentence[1], Graphemes::new("特别"));
+        assert_eq!(sentence[2], Graphemes::new("喜欢"));
+        assert_eq!(sentence[3], Graphemes::new("北京烤鸭"));
+        let another_sentence : Vec<Graphemes> = max_match(&Graphemes::new("english"), &chinese_dictionary);
+        assert_eq!(another_sentence[0], Graphemes::new("e"));
+        assert_eq!(another_sentence[1], Graphemes::new("n"));
+        assert_eq!(another_sentence[2], Graphemes::new("g"));
+        assert_eq!(another_sentence[3], Graphemes::new("l"));
+        assert_eq!(another_sentence[4], Graphemes::new("i"));
+        assert_eq!(another_sentence[5], Graphemes::new("s"));
+        assert_eq!(another_sentence[6], Graphemes::new("h"));
     }
 }
