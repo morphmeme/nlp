@@ -20,9 +20,9 @@ mod metrics {
     /// ```
     /// use nlp::metrics::levenshtein_distance;
     /// use nlp::graphemes_struct::Graphemes;
-    /// assert_eq!(levenshtein_distance(&Graphemes::new("book"), &Graphemes::new("back"), 1), 2);
-    /// assert_eq!(levenshtein_distance(&Graphemes::new("back"), &Graphemes::new("book"), 1), 2);
-    /// assert_eq!(levenshtein_distance(&Graphemes::new("kitten"), &Graphemes::new("sitting"), 1), 3);
+    /// assert_eq!(levenshtein_distance(&Graphemes::from("book"), &Graphemes::from("back"), 1), 2);
+    /// assert_eq!(levenshtein_distance(&Graphemes::from("back"), &Graphemes::from("book"), 1), 2);
+    /// assert_eq!(levenshtein_distance(&Graphemes::from("kitten"), &Graphemes::from("sitting"), 1), 3);
     /// ```
     pub fn levenshtein_distance<'a, T, U>(graphemes1 : &T, graphemes2: &T, sub_cost : usize) -> usize
         where T : Len + Index<usize, Output = U>, U: PartialEq + 'a {
@@ -66,15 +66,15 @@ mod metrics {
     /// use nlp::max_match;
     /// use std::collections::HashSet;
     /// let mut dictionary : HashSet<Graphemes> = HashSet::new();
-    /// dictionary.insert(Graphemes::new("we"));
-    /// dictionary.insert(Graphemes::new("canon"));
-    /// dictionary.insert(Graphemes::new("see"));
-    /// dictionary.insert(Graphemes::new("ash"));
-    /// dictionary.insert(Graphemes::new("ort"));
-    /// dictionary.insert(Graphemes::new("distance"));
-    /// dictionary.insert(Graphemes::new("ahead"));
-    /// let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &dictionary);
-    /// let actual_sentence = Graphemes::new("we can only see a short distance ahead");
+    /// dictionary.insert(Graphemes::from("we"));
+    /// dictionary.insert(Graphemes::from("canon"));
+    /// dictionary.insert(Graphemes::from("see"));
+    /// dictionary.insert(Graphemes::from("ash"));
+    /// dictionary.insert(Graphemes::from("ort"));
+    /// dictionary.insert(Graphemes::from("distance"));
+    /// dictionary.insert(Graphemes::from("ahead"));
+    /// let predicted_sentence = max_match(&Graphemes::from("wecanonlyseeashortdistanceahead"), &dictionary);
+    /// let actual_sentence = Graphemes::from("we can only see a short distance ahead");
     /// assert_eq!(word_error_rate(&actual_sentence, &predicted_sentence),0.625);
     /// ```
     pub fn word_error_rate(actual_sentence : &Graphemes, predict_sentence : &Graphemes) -> f64 {
@@ -96,15 +96,15 @@ mod metrics {
     /// use nlp::max_match;
     /// use std::collections::HashSet;
     /// let mut dictionary : HashSet<Graphemes> = HashSet::new();
-    /// dictionary.insert(Graphemes::new("we"));
-    /// dictionary.insert(Graphemes::new("canon"));
-    /// dictionary.insert(Graphemes::new("see"));
-    /// dictionary.insert(Graphemes::new("ash"));
-    /// dictionary.insert(Graphemes::new("ort"));
-    /// dictionary.insert(Graphemes::new("distance"));
-    /// dictionary.insert(Graphemes::new("ahead"));
-    /// let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &dictionary);
-    /// let actual_sentence = Graphemes::new("we can only see a short distance ahead");
+    /// dictionary.insert(Graphemes::from("we"));
+    /// dictionary.insert(Graphemes::from("canon"));
+    /// dictionary.insert(Graphemes::from("see"));
+    /// dictionary.insert(Graphemes::from("ash"));
+    /// dictionary.insert(Graphemes::from("ort"));
+    /// dictionary.insert(Graphemes::from("distance"));
+    /// dictionary.insert(Graphemes::from("ahead"));
+    /// let predicted_sentence = max_match(&Graphemes::from("wecanonlyseeashortdistanceahead"), &dictionary);
+    /// let actual_sentence = Graphemes::from("we can only see a short distance ahead");
     /// assert_eq!(word_accuracy(&actual_sentence, &predicted_sentence),0.375);
     /// ```
     pub fn word_accuracy(actual_sentence : &Graphemes, predict_sentence : &Graphemes) -> f64 {
@@ -122,64 +122,64 @@ mod test_cases {
     #[test]
     fn edit_distance_basic_test() {
         // empty string
-        assert_eq!(levenshtein_distance(&Graphemes::new(""), &Graphemes::new(""), 1), 0);
+        assert_eq!(levenshtein_distance(&Graphemes::from(""), &Graphemes::from(""), 1), 0);
         // empty string symmetry
-        assert_eq!(levenshtein_distance(&Graphemes::new(""), &Graphemes::new("a"), 1), 1);
-        assert_eq!(levenshtein_distance(&Graphemes::new("a"), &Graphemes::new(""), 1), 1);
+        assert_eq!(levenshtein_distance(&Graphemes::from(""), &Graphemes::from("a"), 1), 1);
+        assert_eq!(levenshtein_distance(&Graphemes::from("a"), &Graphemes::from(""), 1), 1);
 
-        assert_eq!(levenshtein_distance(&Graphemes::new("a"), &Graphemes::new("a"), 1), 0);
-        assert_eq!(levenshtein_distance(&Graphemes::new("a"), &Graphemes::new("b"), 1), 1);
-        assert_eq!(levenshtein_distance(&Graphemes::new("a"), &Graphemes::new("b"), 2), 2);
-        assert_eq!(levenshtein_distance(&Graphemes::new("ab"), &Graphemes::new("a"), 1), 1);
-        assert_eq!(levenshtein_distance(&Graphemes::new("a"), &Graphemes::new("ab"), 1), 1);
+        assert_eq!(levenshtein_distance(&Graphemes::from("a"), &Graphemes::from("a"), 1), 0);
+        assert_eq!(levenshtein_distance(&Graphemes::from("a"), &Graphemes::from("b"), 1), 1);
+        assert_eq!(levenshtein_distance(&Graphemes::from("a"), &Graphemes::from("b"), 2), 2);
+        assert_eq!(levenshtein_distance(&Graphemes::from("ab"), &Graphemes::from("a"), 1), 1);
+        assert_eq!(levenshtein_distance(&Graphemes::from("a"), &Graphemes::from("ab"), 1), 1);
     }
 
     #[test]
     fn edit_distance_vec_of_graphemes_test() {
-        assert_eq!(levenshtein_distance(&vec![Graphemes::new("")]
-                                        , &vec![Graphemes::new(""),], 1), 0);
-        assert_eq!(levenshtein_distance(&vec![Graphemes::new("hello"), Graphemes::new("world")]
-                                        , &vec![Graphemes::new("bye"), Graphemes::new("bye")], 1), 2);
-        assert_eq!(levenshtein_distance(&vec![Graphemes::new("hello")]
-                                        , &vec![Graphemes::new("bye"), Graphemes::new("bye")], 2), 3);
-        assert_eq!(levenshtein_distance(&vec![Graphemes::new("hello"), Graphemes::new("world")]
-                                        , &vec![Graphemes::new("bye")], 2), 3);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::from("")]
+                                        , &vec![Graphemes::from(""),], 1), 0);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::from("hello"), Graphemes::from("world")]
+                                        , &vec![Graphemes::from("bye"), Graphemes::from("bye")], 1), 2);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::from("hello")]
+                                        , &vec![Graphemes::from("bye"), Graphemes::from("bye")], 2), 3);
+        assert_eq!(levenshtein_distance(&vec![Graphemes::from("hello"), Graphemes::from("world")]
+                                        , &vec![Graphemes::from("bye")], 2), 3);
     }
 
     #[test]
     fn edit_distance_example_test() {
-        assert_eq!(levenshtein_distance(&Graphemes::new("book"), &Graphemes::new("back"), 1), 2);
-        assert_eq!(levenshtein_distance(&Graphemes::new("back"), &Graphemes::new("book"), 1), 2);
-        assert_eq!(levenshtein_distance(&Graphemes::new("kitten"), &Graphemes::new("sitting"), 1), 3);
-        assert_eq!(levenshtein_distance(&Graphemes::new("sitting"), &Graphemes::new("kitten"), 1), 3);
-        assert_eq!(levenshtein_distance(&Graphemes::new("longstring"), &Graphemes::new("short"), 1), 9);
-        assert_eq!(levenshtein_distance(&Graphemes::new("short"), &Graphemes::new("longstring"), 1), 9);
-        assert_eq!(levenshtein_distance(&Graphemes::new("superman"), &Graphemes::new("batman"), 1), 5);
-        assert_eq!(levenshtein_distance(&Graphemes::new("batman"), &Graphemes::new("superman"), 1), 5);
-        assert_eq!(levenshtein_distance(&Graphemes::new(""), &Graphemes::new("aaaaaaaaaaaaaaaaa"), 1), 17);
-        assert_eq!(levenshtein_distance(&Graphemes::new("aaaaaaaaaaaaaaaaa"), &Graphemes::new(""), 1), 17);
+        assert_eq!(levenshtein_distance(&Graphemes::from("book"), &Graphemes::from("back"), 1), 2);
+        assert_eq!(levenshtein_distance(&Graphemes::from("back"), &Graphemes::from("book"), 1), 2);
+        assert_eq!(levenshtein_distance(&Graphemes::from("kitten"), &Graphemes::from("sitting"), 1), 3);
+        assert_eq!(levenshtein_distance(&Graphemes::from("sitting"), &Graphemes::from("kitten"), 1), 3);
+        assert_eq!(levenshtein_distance(&Graphemes::from("longstring"), &Graphemes::from("short"), 1), 9);
+        assert_eq!(levenshtein_distance(&Graphemes::from("short"), &Graphemes::from("longstring"), 1), 9);
+        assert_eq!(levenshtein_distance(&Graphemes::from("superman"), &Graphemes::from("batman"), 1), 5);
+        assert_eq!(levenshtein_distance(&Graphemes::from("batman"), &Graphemes::from("superman"), 1), 5);
+        assert_eq!(levenshtein_distance(&Graphemes::from(""), &Graphemes::from("aaaaaaaaaaaaaaaaa"), 1), 17);
+        assert_eq!(levenshtein_distance(&Graphemes::from("aaaaaaaaaaaaaaaaa"), &Graphemes::from(""), 1), 17);
     }
 
     #[test]
     fn edit_distance_chinese_test() {
-        assert_eq!(levenshtein_distance(&Graphemes::new("己所不欲勿施于人"), &Graphemes::new("back"), 1), 8);
-        assert_eq!(levenshtein_distance(&Graphemes::new("back"), &Graphemes::new("己所不欲勿施于人"), 1), 8);
-        assert_eq!(levenshtein_distance(&Graphemes::new("己所不欲勿施于人"), &Graphemes::new("不患人之不己知患不知人也"), 1), 10);
-        assert_eq!(levenshtein_distance(&Graphemes::new("不患人之不己知患不知人也"), &Graphemes::new("己所不欲勿施于人"), 1), 10);
+        assert_eq!(levenshtein_distance(&Graphemes::from("己所不欲勿施于人"), &Graphemes::from("back"), 1), 8);
+        assert_eq!(levenshtein_distance(&Graphemes::from("back"), &Graphemes::from("己所不欲勿施于人"), 1), 8);
+        assert_eq!(levenshtein_distance(&Graphemes::from("己所不欲勿施于人"), &Graphemes::from("不患人之不己知患不知人也"), 1), 10);
+        assert_eq!(levenshtein_distance(&Graphemes::from("不患人之不己知患不知人也"), &Graphemes::from("己所不欲勿施于人"), 1), 10);
     }
 
     #[test]
     fn word_error_rate_test() {
         let mut dictionary : HashSet<Graphemes> = HashSet::new();
-        dictionary.insert(Graphemes::new("we"));
-        dictionary.insert(Graphemes::new("canon"));
-        dictionary.insert(Graphemes::new("see"));
-        dictionary.insert(Graphemes::new("ash"));
-        dictionary.insert(Graphemes::new("ort"));
-        dictionary.insert(Graphemes::new("distance"));
-        dictionary.insert(Graphemes::new("ahead"));
-        let predicted_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &dictionary);
-        let actual_sentence = Graphemes::new("we can only see a short distance ahead");
+        dictionary.insert(Graphemes::from("we"));
+        dictionary.insert(Graphemes::from("canon"));
+        dictionary.insert(Graphemes::from("see"));
+        dictionary.insert(Graphemes::from("ash"));
+        dictionary.insert(Graphemes::from("ort"));
+        dictionary.insert(Graphemes::from("distance"));
+        dictionary.insert(Graphemes::from("ahead"));
+        let predicted_sentence = max_match(&Graphemes::from("wecanonlyseeashortdistanceahead"), &dictionary);
+        let actual_sentence = Graphemes::from("we can only see a short distance ahead");
         assert_eq!(word_error_rate(&actual_sentence, &predicted_sentence),0.625);
         assert_eq!(word_error_rate(&actual_sentence, &actual_sentence),0.0)
     }

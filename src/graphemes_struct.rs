@@ -9,6 +9,7 @@ mod graphemes_struct {
     use std::fmt;
     use len_trait::len::{Len, Empty, Clear};
     use push_trait::base::{Push, CanPush};
+    use std::slice::SliceIndex;
 
     /// Vector of graphemes
     #[derive(Debug, Hash, Eq, PartialEq)]
@@ -17,7 +18,13 @@ mod graphemes_struct {
     }
 
     impl<'a> Graphemes<'a> {
-        pub fn new(string : &'a str) -> Graphemes<'a> {
+        pub fn new() -> Graphemes<'a> {
+            Graphemes {
+                graphemes: vec![]
+            }
+        }
+
+        pub fn from(string : &'a str) -> Graphemes<'a> {
             let graphemes = UnicodeSegmentation::graphemes(string, true).collect::<Vec<&str>>();
             Graphemes {
                 graphemes,
@@ -73,17 +80,18 @@ mod graphemes_struct {
         }
     }
 
-    impl<'a> Index<usize> for Graphemes<'a> {
-        type Output = &'a str;
 
-        fn index(&self, index: usize) -> & &'a str {
-            &self.graphemes[index]
+    impl<'a, T : 'a + SliceIndex<[&'a str]>> Index<T> for Graphemes<'a> {
+        type Output = T::Output;
+
+        fn index(&self, index: T) -> &Self::Output {
+            Index::index(&***self, index)
         }
     }
 
-    impl<'a> IndexMut<usize> for Graphemes<'a> {
-        fn index_mut(&mut self, index: usize) -> &mut &'a str  {
-            &mut self.graphemes[index]
+    impl<'a, T : 'a + SliceIndex<[&'a str]>> IndexMut<T> for Graphemes<'a> {
+        fn index_mut(&mut self, index: T) -> &mut Self::Output  {
+            IndexMut::index_mut(&mut *self.graphemes, index)
         }
     }
 
@@ -106,7 +114,7 @@ mod graphemes_struct {
 
     impl<'a> Default for Graphemes<'a> {
         fn default() -> Self {
-            Graphemes::new("")
+            Graphemes::new()
         }
     }
 
@@ -119,6 +127,6 @@ mod test_cases {
 
     #[test]
     fn graphemes_split_test() {
-        assert_eq!(Graphemes::new("hello world").split(" "), vec![Graphemes::new("hello"), Graphemes::new("world")])
+        assert_eq!(Graphemes::from("hello world").split(" "), vec![Graphemes::from("hello"), Graphemes::from("world")])
     }
 }

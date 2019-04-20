@@ -23,7 +23,7 @@ type Coordinate = (usize, usize);
 /// use nlp::alignment_path;
 /// use nlp::graphemes_struct::Graphemes;
 ///
-/// alignment_path(&Graphemes::new("dog"), &Graphemes::new("woof"), 1);
+/// alignment_path(&Graphemes::from("dog"), &Graphemes::from("woof"), 1);
 /// // returns [(0, 0), (1, 1), (2, 2), (3, 3), (3, 4)]
 /// ```
 pub fn alignment_path<'a, T, U>(graphemes1 : &T, graphemes2: &T, sub_cost : usize) -> Vec<Coordinate>
@@ -45,8 +45,8 @@ pub fn alignment_path<'a, T, U>(graphemes1 : &T, graphemes2: &T, sub_cost : usiz
 /// ```
 /// use nlp::alignment_strings;
 /// use nlp::graphemes_struct::Graphemes;
-/// let intention = Graphemes::new("intention");
-/// let execution = Graphemes::new("execution");
+/// let intention = Graphemes::from("intention");
+/// let execution = Graphemes::from("execution");
 /// let strings = alignment_strings(&intention, &execution, 1, " ");
 /// // strings contains
 /// // 0. inten tion
@@ -93,16 +93,16 @@ pub fn alignment_strings<'a, T, U>(graphemes1 : &T, graphemes2 : &T, sub_cost : 
 /// use nlp::graphemes_struct::Graphemes;
 /// use std::collections::HashSet;
 /// let mut dictionary : HashSet<Graphemes> = HashSet::new();
-///        dictionary.insert(Graphemes::new("他"));
-///        dictionary.insert(Graphemes::new("特别"));
-///        dictionary.insert(Graphemes::new("喜欢"));
-///        dictionary.insert(Graphemes::new("北京烤鸭"));
-/// let sentence = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &dictionary);
-/// assert_eq!(&sentence, &Graphemes::new("他 特别 喜欢 北京烤鸭"));
+///        dictionary.insert(Graphemes::from("他"));
+///        dictionary.insert(Graphemes::from("特别"));
+///        dictionary.insert(Graphemes::from("喜欢"));
+///        dictionary.insert(Graphemes::from("北京烤鸭"));
+/// let sentence = max_match(&Graphemes::from("他特别喜欢北京烤鸭"), &dictionary);
+/// assert_eq!(&sentence, &Graphemes::from("他 特别 喜欢 北京烤鸭"));
 /// ```
 pub fn max_match<'a>(sentence : &Graphemes<'a>, dictionary : &HashSet<Graphemes>) -> Graphemes<'a> {
     if sentence.is_empty() {
-        return Graphemes::new("");
+        return Graphemes::from("");
     }
     for i in (1..sentence.len()+1).rev() {
         let mut first_word = sentence.slice(0,i);
@@ -195,76 +195,76 @@ mod test_cases {
     #[test]
     fn alignment_path_basic_test() {
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new(""), 2, " "), 0);
+            &Graphemes::from(""), &Graphemes::from(""), 2, " "), 0);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new("a"), 2, " "), 1);
+            &Graphemes::from(""), &Graphemes::from("a"), 2, " "), 1);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("a"), &Graphemes::new(""), 2, " "), 1);
+            &Graphemes::from("a"), &Graphemes::from(""), 2, " "), 1);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new("aa"), 2, " "), 2);
+            &Graphemes::from(""), &Graphemes::from("aa"), 2, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("aa"), &Graphemes::new(""), 2, " "), 2);
+            &Graphemes::from("aa"), &Graphemes::from(""), 2, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("a"), &Graphemes::new("b"), 2, " "), 2);
+            &Graphemes::from("a"), &Graphemes::from("b"), 2, " "), 2);
     }
 
     #[test]
     fn alignment_path_example_test() {
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("book"), &Graphemes::new("back"), 1, " "), 2);
+            &Graphemes::from("book"), &Graphemes::from("back"), 1, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("back"), &Graphemes::new("book"), 1, " "), 2);
+            &Graphemes::from("back"), &Graphemes::from("book"), 1, " "), 2);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("kitten"), &Graphemes::new("sitting"), 1, " "), 3);
+            &Graphemes::from("kitten"), &Graphemes::from("sitting"), 1, " "), 3);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("sitting"), &Graphemes::new("kitten"), 1, " "), 3);
+            &Graphemes::from("sitting"), &Graphemes::from("kitten"), 1, " "), 3);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("longstring"), &Graphemes::new("short"), 1, " "), 9);
+            &Graphemes::from("longstring"), &Graphemes::from("short"), 1, " "), 9);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("short"), &Graphemes::new("longstring"), 1, " "), 9);
+            &Graphemes::from("short"), &Graphemes::from("longstring"), 1, " "), 9);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("superman"), &Graphemes::new("batman"), 1, " "), 5);
+            &Graphemes::from("superman"), &Graphemes::from("batman"), 1, " "), 5);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("batman"), &Graphemes::new("superman"), 1, " "), 5);
+            &Graphemes::from("batman"), &Graphemes::from("superman"), 1, " "), 5);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new(""), &Graphemes::new("aaaaaaaaaaaaaaaaa"), 1, " "), 17);
+            &Graphemes::from(""), &Graphemes::from("aaaaaaaaaaaaaaaaa"), 1, " "), 17);
         assert_eq!(calculate_edit_distance_from_alignment(
-            &Graphemes::new("aaaaaaaaaaaaaaaaa"), &Graphemes::new(""), 1, " "), 17);
+            &Graphemes::from("aaaaaaaaaaaaaaaaa"), &Graphemes::from(""), 1, " "), 17);
     }
 
     fn chinese_dictionary() -> HashSet<Graphemes<'static>> {
         let mut dictionary : HashSet<Graphemes> = HashSet::new();
-        dictionary.insert(Graphemes::new("他"));
-        dictionary.insert(Graphemes::new("特别"));
-        dictionary.insert(Graphemes::new("喜欢"));
-        dictionary.insert(Graphemes::new("北京烤鸭"));
+        dictionary.insert(Graphemes::from("他"));
+        dictionary.insert(Graphemes::from("特别"));
+        dictionary.insert(Graphemes::from("喜欢"));
+        dictionary.insert(Graphemes::from("北京烤鸭"));
         dictionary
     }
 
     fn english_dictionary() -> HashSet<Graphemes<'static>> {
         let mut dictionary : HashSet<Graphemes> = HashSet::new();
-        dictionary.insert(Graphemes::new("we"));
-        dictionary.insert(Graphemes::new("canon"));
-        dictionary.insert(Graphemes::new("see"));
-        dictionary.insert(Graphemes::new("ash"));
-        dictionary.insert(Graphemes::new("ort"));
-        dictionary.insert(Graphemes::new("distance"));
-        dictionary.insert(Graphemes::new("ahead"));
+        dictionary.insert(Graphemes::from("we"));
+        dictionary.insert(Graphemes::from("canon"));
+        dictionary.insert(Graphemes::from("see"));
+        dictionary.insert(Graphemes::from("ash"));
+        dictionary.insert(Graphemes::from("ort"));
+        dictionary.insert(Graphemes::from("distance"));
+        dictionary.insert(Graphemes::from("ahead"));
         dictionary
     }
 
     #[test]
     fn max_match_test() {
         let chinese_dictionary = chinese_dictionary();
-        let empty_sentence : Graphemes = max_match(&Graphemes::new(""), &chinese_dictionary);
+        let empty_sentence : Graphemes = max_match(&Graphemes::from(""), &chinese_dictionary);
         assert!(empty_sentence.is_empty());
-        let sentence = max_match(&Graphemes::new("他特别喜欢北京烤鸭"), &chinese_dictionary);
-        assert_eq!(&sentence, &Graphemes::new("他 特别 喜欢 北京烤鸭"));
-        let another_sentence = max_match(&Graphemes::new("english"), &chinese_dictionary);
-        assert_eq!(&another_sentence, &Graphemes::new("e n g l i s h"));
+        let sentence = max_match(&Graphemes::from("他特别喜欢北京烤鸭"), &chinese_dictionary);
+        assert_eq!(&sentence, &Graphemes::from("他 特别 喜欢 北京烤鸭"));
+        let another_sentence = max_match(&Graphemes::from("english"), &chinese_dictionary);
+        assert_eq!(&another_sentence, &Graphemes::from("e n g l i s h"));
 
         let english_dictionary = english_dictionary();
-        let example_sentence = max_match(&Graphemes::new("wecanonlyseeashortdistanceahead"), &english_dictionary);
-        assert_eq!(&example_sentence, &Graphemes::new("we canon l y see ash ort distance ahead"));
+        let example_sentence = max_match(&Graphemes::from("wecanonlyseeashortdistanceahead"), &english_dictionary);
+        assert_eq!(&example_sentence, &Graphemes::from("we canon l y see ash ort distance ahead"));
     }
 }
