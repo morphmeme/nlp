@@ -41,10 +41,10 @@ mod graphemes_struct {
             self.graphemes.append(&mut other.graphemes);
         }
 
-//        pub fn split(&self, splitter : &'a str) -> Vec<Graphemes> {
-//            self.graphemes.split(|character| character == splitter).map(
-//                |str_arr| Graphemes { graphemes: str_arr.to_vec()} ).collect_vec()
-//        }
+        pub fn split(&self, splitter : &'a str) -> Vec<Graphemes> {
+            self.graphemes.split(|character| *character == splitter).map(
+                |str_arr| Graphemes { graphemes: str_arr.to_vec()} ).collect()
+        }
     }
 
     impl<'a> Display for Graphemes<'a> {
@@ -111,4 +111,14 @@ mod graphemes_struct {
     }
 
 
+}
+
+#[cfg(test)]
+mod test_cases {
+    use super::graphemes_struct::Graphemes;
+
+    #[test]
+    fn graphemes_split_test() {
+        assert_eq!(Graphemes::new("hello world").split(" "), vec![Graphemes::new("hello"), Graphemes::new("world")])
+    }
 }

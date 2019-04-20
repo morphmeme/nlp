@@ -2,3 +2,4 @@
 - [x] Exercise 2.6 (edit distance)
 - [x] Exercise 2.7 (alignment)
 - [x] Exercise 2.8 (max match)
+- [x] Exercise 2.9 (word error metric)
