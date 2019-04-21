@@ -1,6 +1,8 @@
-pub use self::metrics::levenshtein_distance;
-pub use self::metrics::word_error_rate;
-pub use self::metrics::word_accuracy;
+pub use self::metrics::{
+    levenshtein_distance,
+    word_error_rate,
+    word_accuracy
+};
 
 mod metrics {
     use itertools::Itertools;

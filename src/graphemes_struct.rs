@@ -11,7 +11,8 @@ mod graphemes_struct {
     use push_trait::base::{Push, CanPush};
     use std::slice::SliceIndex;
 
-    /// Vector of graphemes
+    /// A vector of graphemes.
+    /// Graphemes can vary in size which is why Vec<&str> is used.
     #[derive(Debug, Hash, Eq, PartialEq)]
     pub struct Graphemes<'a> {
         graphemes : Vec<&'a str>,
